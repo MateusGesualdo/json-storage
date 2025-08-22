@@ -1,24 +1,52 @@
+import express from 'express'
 import { readFileSync, writeFileSync } from 'fs'
 
-try {
-    const fileBuffer = readFileSync('./data.json')
-    const fileText = fileBuffer.toString()
-    const fileData = JSON.parse(fileText)
 
-    const userAction = process.argv[2]
-    const key = process.argv[3]
-    const value = process.argv[4]
+const app = express()
+app.use(express.json())
+const port = 3333
 
-    if (userAction === "get") {
-        console.log(fileData[key])
-    } else if (userAction === "set") {
-        fileData[key] = value
-        writeFileSync("./data.json", JSON.stringify(fileData))
-        console.log("Ok")
-    } else {
-        console.log("Comando inválido")
+app.get('/', (req, res) => {
+    try {
+        const fileBuffer = readFileSync('./data.json')
+        const fileText = fileBuffer.toString()
+        const fileData = JSON.parse(fileText)
+
+        res.send(fileData)
+    } catch (error) {
+        console.log("Algo inesperado ocorreu =/")
+        res.status(500).send('Internal server error')
     }
+})
 
-} catch (error) {
-    console.log("Algo inesperado ocorreu =/")
-}
+app.post('/', (request, response) => {
+    try {
+        const fileBuffer = readFileSync('./data.json')
+        const fileText = fileBuffer.toString()
+        const highScores = JSON.parse(fileText)
+
+        // console.log(request.body)
+        const playerIndex = highScores.findIndex(element => element.player === request.body.player)
+
+        if (playerIndex === -1) {
+            highScores.push({
+                player: request.body.player,
+                score: request.body.score
+            })
+        } else if (request.body.score < highScores[playerIndex].score) {
+            highScores[playerIndex].score = request.body.score
+        }
+
+        writeFileSync("./data.json", JSON.stringify(highScores))
+
+        response.send('OK')
+    } catch (error) {
+        console.log(error.message)
+        response.status(500).send('Internal server error')
+    }
+})
+
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})

@@ -5,7 +5,8 @@ GET http://127.0.0.1:3333
 POST http://127.0.0.1:3333
 content-type: application/json
 
+# linha em branco separa o header do body
 {
-    "player":"joao",
-    "score": 6
+    "player":"teste",
+    "score": 45
 }

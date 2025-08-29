@@ -39,10 +39,10 @@ app.post('/', (request, response) => {
 
         writeFileSync("./data.json", JSON.stringify(highScores))
 
-        response.send('OK')
+        response.send({message:'OK'})
     } catch (error) {
         console.log(error.message)
-        response.status(500).send('Internal server error')
+        response.status(500).send({message:'Internal server error'})
     }
 })
 
